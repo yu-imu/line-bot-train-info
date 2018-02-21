@@ -37,10 +37,17 @@ gem 'jbuilder', '~> 2.5'
 gem 'dotenv-rails'
 gem 'line-bot-api'
 
+# uses session
+gem 'redis'
+gem 'redis-rails'
+# use .env
+gem 'dotenv-rails'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  # gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
+  gem 'pry-byebug'
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
 end

@@ -1,24 +1,19 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+交通経路検索をlineのチャット上で行います。
 
-Things you may want to cover:
+注意) これは、ローカル環境でしか動きません。
 
-* Ruby version
+* 使用技術
+line messenger api https://developers.line.me/ja/docs/messaging-api/reference/
+ruby 2.3.1 ruby on rails 5.0
+Redis server v4.0.6 redis-cli 4.0.6
 
-* System dependencies
+* セットアップ
+bundle exec rails server && ngrok http 3000
+redis-server && redis-cli
 
-* Configuration
+* 開発の所感
+交通経路の結果を出力する場合にbotというアプリケーションは向いてないことがわかった。リアクティブな特徴が活かせてないのが勿体無い。
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+created at 2018.2.22
