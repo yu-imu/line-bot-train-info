@@ -13,6 +13,8 @@ Redis server v4.0.6 redis-cli 4.0.6
 * セットアップ
 bundle exec rails server && ngrok http 3000
 redis-server && redis-cli
+redis-serverが立ち上がらない時
+https://askubuntu.com/questions/949119/error-when-starting-redis-server-address-already-in-use
 
 * 開発の所感
 交通経路の結果を出力する場合にbotというアプリケーションは向いてないことがわかった。リアクティブな特徴が活かせてないのが勿体無い。
