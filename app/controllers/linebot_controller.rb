@@ -14,29 +14,41 @@ class LinebotController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           repley_text = event.message['text']
-          if repley_text.include?("駅")
+          if repley_text == "前のダイア"
+            save_data = Redis.current.get 'past_rquest'
+            request_url = URI.escape("https://api.apigw.smt.docomo.ne.jp/ekispertCorp/v1/courseEdit?assignInstruction=AutoPrevious&serializeData=#{save_data}&APIKEY=#{KEY_PARAMS}")
+            repley_text = get_station_info(request_url)
+          elsif repley_text == "次のダイア"
+            save_data = Redis.current.get 'past_rquest'
+            request_url = URI.escape("https://api.apigw.smt.docomo.ne.jp/ekispertCorp/v1/courseEdit?assignInstruction=AutoNext&serializeData=#{save_data}&APIKEY=#{KEY_PARAMS}")
+            repley_text = get_station_info(request_url)
+          elsif repley_text.include?("駅")
             set_station(repley_text)
            if @deparature_str && @destination_str
              request_url = URI.escape("https://api.apigw.smt.docomo.ne.jp/ekispertCorp/v1/searchCourse?APIKEY=#{KEY_PARAMS}&from=#{@deparature_str}&to=#{@destination_str}")
-             arr = []
-             station = get_json(request_url)
-
-             if station.nil?
-               repley_text = "お探しの駅は見つからなかったぺこ"
-             else
-               time_table = station["ResultSet"]["Course"][0]["Route"]["Line"]
-               stations = station["ResultSet"]["Course"][0]["Route"]["Point"]
-               stations.zip(time_table).each do |station, table|
-                 st_name = station["Station"]["Name"]
-                 date = table ? table["ArrivalState"]["Datetime"]["text"] : nil
-                 if date
-                   date = date.to_time.strftime("%m/%d %H:%M")
-                 end
-                 train_direction = table ? table["Name"] : "(着)"
-                 arr << "#{st_name}駅#{date}#{train_direction}"
-                 repley_text = arr.join("→")
-             end
-            end
+             repley_text = get_stations_info(request_url)
+             # userAgentを実装したい。
+             message = {
+               type: "template",
+               altText: repley_text,
+               template: {
+                   type: "confirm",
+                   text: repley_text,
+                   actions: [
+                       {
+                         type: "message",
+                         label: "前のダイア",
+                         text: "前のダイア"
+                       },
+                       {
+                         type: "message",
+                         label: "次のダイア",
+                         text: "次のダイア"
+                       }
+                   ]
+               }
+             }
+            client.reply_message(event['replyToken'], message)
            else
              repley_text = "２つめの駅を入力するぺこ"
            end
@@ -52,6 +64,53 @@ class LinebotController < ApplicationController
       end
     }
     head :ok
+  end
+
+  def get_station_info(request_url)
+    station = get_json(request_url)
+    arr = []
+    if station.nil?
+      repley_text = "お探しのダイアは見つからなかったぺこ"
+    else
+      time_table = station["ResultSet"]["Course"]["Route"]["Line"]
+      stations = station["ResultSet"]["Course"]["Route"]["Point"]
+      request_url = station["ResultSet"]["Course"]["SerializeData"]
+      stations.zip(time_table).each do |station, table|
+        st_name = station["Station"]["Name"]
+        date = table ? table["ArrivalState"]["Datetime"]["text"] : nil
+        if date
+          date = date.to_time.strftime("%m/%d %H:%M")
+        end
+        train_direction = table ? table["Name"] : "(着)"
+        arr << "#{st_name}駅#{date}#{train_direction}"
+        repley_text = arr.join("→")
+      end
+    end
+    return repley_text
+  end
+
+  def get_stations_info(request_url)
+    station = get_json(request_url)
+    arr = []
+    if station.nil?
+      repley_text = "お探しの駅は見つからなかったぺこ"
+    else
+      time_table = station["ResultSet"]["Course"][0]["Route"]["Line"]
+      stations = station["ResultSet"]["Course"][0]["Route"]["Point"]
+      request_url = station["ResultSet"]["Course"][0]["SerializeData"]
+      Redis.current.set("past_rquest", request_url)
+      stations.zip(time_table).each do |station, table|
+        st_name = station["Station"]["Name"]
+        date = table ? table["ArrivalState"]["Datetime"]["text"] : nil
+        if date
+          date = date.to_time.strftime("%m/%d %H:%M")
+        end
+        train_direction = table ? table["Name"] : "(着)"
+        arr << "#{st_name}駅#{date}#{train_direction}"
+        repley_text = arr.join("→")
+      end
+    end
+    return repley_text
   end
 
   def set_station(get_station)
