@@ -3,7 +3,7 @@ class LinebotController < ApplicationController
   require "date"
   include ReplyApi
   include AnalysisWords
-  KEY_PARAMS = "686a4253703557777952514863563554316a75444a50346e6f5836696648374f754d43776835354a627041"
+  KEY_PARAMS = ENV['API_KEY']
 
   def callback
     body = request.body.read
@@ -27,7 +27,6 @@ class LinebotController < ApplicationController
            if @deparature_str && @destination_str
              request_url = URI.escape("https://api.apigw.smt.docomo.ne.jp/ekispertCorp/v1/searchCourse?APIKEY=#{KEY_PARAMS}&from=#{@deparature_str}&to=#{@destination_str}")
              repley_text = get_stations_info(request_url)
-             # userAgentを実装したい。
              message = {
                type: "template",
                altText: repley_text,
@@ -95,6 +94,7 @@ class LinebotController < ApplicationController
     if station.nil?
       repley_text = "お探しの駅は見つからなかったぺこ"
     else
+      # eachがうまく回らないのが原因
       time_table = station["ResultSet"]["Course"][0]["Route"]["Line"]
       stations = station["ResultSet"]["Course"][0]["Route"]["Point"]
       request_url = station["ResultSet"]["Course"][0]["SerializeData"]
