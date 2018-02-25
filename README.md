@@ -5,10 +5,14 @@ created at 2018.2.22
 注意) これは、ローカル環境でしか動きません。  
 
 * **使用技術**  
-line messenger api <https://developers.line.me/ja/docs/messaging-api/reference>
-ruby 2.3.1 ruby on rails 5.0
-Redis server v4.0.6 redis-cli 4.0.6
-MeCab 辞書 mecab-ipadic-neologd  
+line messenger api <https://developers.line.me/ja/docs/messaging-api/reference>  
+|    tool      |   version    |
+|:------------:|:------------:|
+|    ruby      |    2.3.1     |
+|ruby on rails |    5.0       |
+|Redis server  |    4.0.6     |
+|redis-cli     |    4.0.6     |
+|mecab         |mecab-ipadic-neologd|  
 
 * **セットアップ**  
 bundle exec rails server && ngrok http 3000
