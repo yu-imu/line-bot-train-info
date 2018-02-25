@@ -1,7 +1,5 @@
 ## 経路検索 Bot on Line
 ![line_photo1](https://user-images.githubusercontent.com/17560599/36638706-9d009976-1a3f-11e8-8f92-2099c5d13299.png)  
-* **交通経路検索をlineのチャット上で行います**  
-(注意) 現在はローカル環境でしか動きません。  
 
 * **使用技術**  
 [Messaging API](https://developers.line.me/ja/docs/messaging-api/reference)  
@@ -29,5 +27,5 @@
 交通経路の結果を出力する場合にbotというアプリケーションは向いてないことがわかった。
 リアクティブな特徴が活かせてないのが勿体無い。
 
-* **今後の展望**
+* **今後の展望**  
 本番環境にもリリースする予定です。
