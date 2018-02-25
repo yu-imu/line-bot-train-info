@@ -94,18 +94,26 @@ class LinebotController < ApplicationController
     if station.nil?
       repley_text = "お探しの駅は見つからなかったぺこ"
     else
-      # eachがうまく回らないのが原因
       time_table = station["ResultSet"]["Course"][0]["Route"]["Line"]
       stations = station["ResultSet"]["Course"][0]["Route"]["Point"]
       request_url = station["ResultSet"]["Course"][0]["SerializeData"]
       Redis.current.set("past_rquest", request_url)
-      stations.zip(time_table).each do |station, table|
+      stations.each_with_index do |station, i|
         st_name = station["Station"]["Name"]
-        date = table ? table["ArrivalState"]["Datetime"]["text"] : nil
+        begin
+          if time_table[i]
+            date = time_table[i]["ArrivalState"]["Datetime"]["text"]
+          else
+            date = time_table["ArrivalState"]["Datetime"]["text"] if i == 0
+          end
+         train_direction = time_table[i] ? time_table[i]["Name"] : time_table["Name"]
+        rescue
+          # time_table[i]が１つ不足するため
+        end
+
         if date
           date = date.to_time.strftime("%m/%d %H:%M")
         end
-        train_direction = table ? table["Name"] : "(着)"
         arr << "#{st_name}駅#{date}#{train_direction}"
         repley_text = arr.join("→")
       end
@@ -114,11 +122,10 @@ class LinebotController < ApplicationController
   end
 
   def set_station(get_station)
-    # 形態素解析
-    get_stations = classify_word(get_station)
+    get_stations = classify_word(get_station)# 形態素解析
     from_station = get_stations[0].to_s
     to_station = get_stations[1].to_s
-    cache_station = Redis.current.get 'station'# １つめの駅をキャッシュしてある。
+    cache_station = Redis.current.get 'station'
 
     if to_station.empty? && !cache_station
       from_station_name = from_station[0, from_station.length-1] # 駅処理
@@ -126,7 +133,7 @@ class LinebotController < ApplicationController
     elsif cache_station.present?
       from_station_name = from_station[0, from_station.length-1]
       @deparature_str = cache_station
-      @destination_str = from_station_name # ２つめに入力したやつ
+      @destination_str = from_station_name
       Redis.current.flushdb
     else
       from_station_name = from_station[0, from_station.length-1] # 駅処理
