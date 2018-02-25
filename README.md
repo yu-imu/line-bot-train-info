@@ -1,7 +1,6 @@
 ## README
-**交通経路検索をlineのチャット上で行います**　　
-![画像](https://user-images.githubusercontent.com/17560599/36638638-e38d25a0-1a3d-11e8-932a-5a1373c3160c.png)  
-
+![line_photo1](https://user-images.githubusercontent.com/17560599/36638706-9d009976-1a3f-11e8-8f92-2099c5d13299.png)  
+**交通経路検索をlineのチャット上で行います**  
 注意) これは、ローカル環境でしか動きません。  
 
 * **使用技術**  
